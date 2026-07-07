@@ -14,8 +14,8 @@ public class ServoSubsystem {
     private Servo holdServo;
 
     // Push Servo Positions
-    private double pushEngagedPos = 1.0;   // Push servo engaged (pushing artifact)
-    private double pushRetractedPos = 0.0; // Push servo retracted (ready position)
+    private double pushEngagedPos = 0.9;   // Push servo engaged (pushing artifact)
+    private double pushRetractedPos = 0.3; // Push servo retracted (ready position)
     private boolean pushActive = false;    // Tracks push servo state
 
     // Hold Servo Positions
@@ -42,8 +42,9 @@ public class ServoSubsystem {
      */
     public void setHoldServo(Servo holdServo) {
         this.holdServo = holdServo;
-        retractHold(); // Initialize hold servo to retracted position
+        // Do NOT move servo automatically — leave it wherever it currently is
     }
+
 
     // ═══════════════════════════════════════════════════════════════════════
     // PUSH SERVO CONTROLS (Primary artifact pushing)

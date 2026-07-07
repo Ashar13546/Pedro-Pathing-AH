@@ -9,12 +9,14 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
-@Autonomous(name = "EnumeratedStateAuto(V2.0)", group = "Examples")
+
+//@Autonomous(name = "EnumeratedStateAuto(V2.0)", group = "Examples")
 public class EnumeratedStateAutoTwo extends OpMode {
 
     // ===== CONSTANTS =====

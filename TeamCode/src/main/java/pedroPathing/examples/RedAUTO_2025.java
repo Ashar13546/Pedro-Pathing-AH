@@ -24,7 +24,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 @Config
-@Autonomous(name = "RedAUTO 2025 DECODE", group = "SeasonAutos")
+//@Autonomous(name = "RedAUTO 2025 DECODE", group = "SeasonAutos")
 public class RedAUTO_2025 extends OpMode {
 
     public static double adaptiveMaxPower = 0.5;
@@ -50,14 +50,12 @@ public class RedAUTO_2025 extends OpMode {
     private boolean rpmDipped = false;
     private long stepStartTime = 0;
 
-    // ═══ MIRRORED FOR RED SIDE ═══
-
-    private final Pose startPose         = new Pose(144 - 22, 122.5, Math.toRadians((143 + 180 + 180) % 360)); // = 143°
-    private final Pose shootPose         = new Pose(144 - 37, 117.5, Math.toRadians((149 + 180 + 180) % 360)); // = 149°
-    private final Pose preIntakePose     = new Pose(144 - 70, 84,     Math.toRadians((0 + 180 + 180) % 360));  // = 0°
-    private final Pose intakeMovePose    = new Pose(144 - 25, 84,     Math.toRadians((0 + 180 + 180) % 360));  // = 0°
-    private final Pose intakeReturnPose  = new Pose(144 - 70, 84,     Math.toRadians((0 + 180 + 180) % 360));  // = 0°
-    private final Pose intakeToShootPose = new Pose(144 - 37, 117.5,  Math.toRadians((149 + 180 + 180) % 360));// = 149°
+    private final Pose startPose         = new Pose(122.5, 122.5, Math.toRadians((35 + 180) % 360)); //no cange
+    private final Pose shootPose         = new Pose(113, 125, Math.toRadians((6 + 180) % 360));
+    private final Pose preIntakePose     = new Pose(80, 82,   Math.toRadians((180 + 180) % 360));
+    private final Pose intakeMovePose    = new Pose(120, 82,   Math.toRadians((180 + 180) % 360));
+    private final Pose intakeReturnPose  = new Pose(80, 82,   Math.toRadians((180 + 180) % 360));
+    private final Pose intakeToShootPose = new Pose(113, 125,Math.toRadians((6 + 180) % 360));
 
     private PathChain toShootFromStart, toPreIntake, intakeOnMove, intakeOffReturn, toShootReturn;
 
@@ -85,7 +83,7 @@ public class RedAUTO_2025 extends OpMode {
         currentVoltage = voltageSensor.getVoltage();
 
         pathTimer = new Timer();
-        multiTelemetry.addLine("✅ RedAUTO_2025 Ready");
+        multiTelemetry.addLine("✅ BlueAUTO_2025 Ready");
         multiTelemetry.addData("Start Pose", startPose);
         multiTelemetry.update();
     }
@@ -154,13 +152,10 @@ public class RedAUTO_2025 extends OpMode {
                 break;
 
             case 1:
-                // ✅ Turn ON shooter at start of first shooting cycle
                 if (shotStep == 0 && currentShot == 0) {
                     shooter.startShooter();
                 }
                 if (handleShootingPhase()) {
-                    // ✅ Turn OFF shooter after shooting cycle completes
-                    shooter.stopShooter();
                     follower.followPath(toPreIntake);
                     setPathState(2);
                 }
@@ -195,12 +190,7 @@ public class RedAUTO_2025 extends OpMode {
                 break;
 
             case 5:
-                // ✅ Turn ON shooter at start of second shooting cycle
-                if (shotStep == 0 && currentShot == 0) {
-                    shooter.startShooter();
-                }
                 if (handleShootingPhase()) {
-                    // ✅ Turn OFF shooter after shooting cycle completes
                     shooter.stopShooter();
                     setPathState(-1);
                 }
@@ -259,7 +249,7 @@ public class RedAUTO_2025 extends OpMode {
                     transfer.stop();
                     stepStartTime = now;
                     shotStep = 6; // Go to cooldown
-                } else if (now - stepStartTime > 5000) {
+                } else if (now - stepStartTime > 3000) {
                     // Timeout - use push servo as fallback
                     servos.engagePush();
                     stepStartTime = now;

@@ -7,12 +7,14 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
-@Autonomous(name = "AutoTestOne()", group = "Examples")
+
+//@Autonomous(name = "AutoTestOne()", group = "Examples")
 public class AutoTestOne extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

@@ -24,7 +24,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 @Config
-@Autonomous(name = "BlueAUTO 2025 DECODE", group = "SeasonAutos")
+//@Autonomous(name = "BlueAUTO 2025 DECODE", group = "SeasonAutos")
 public class BlueAUTO_2025 extends OpMode {
 
     public static double adaptiveMaxPower = 0.5;
@@ -50,12 +50,12 @@ public class BlueAUTO_2025 extends OpMode {
     private boolean rpmDipped = false;
     private long stepStartTime = 0;
 
-    private final Pose startPose         = new Pose(22, 122.5, Math.toRadians((143 + 180) % 360));
-    private final Pose shootPose         = new Pose(37, 117.5, Math.toRadians((149 + 180) % 360));
-    private final Pose preIntakePose     = new Pose(70, 84,   Math.toRadians((0 + 180) % 360));
-    private final Pose intakeMovePose    = new Pose(25, 84,   Math.toRadians((0 + 180) % 360));
-    private final Pose intakeReturnPose  = new Pose(70, 84,   Math.toRadians((0 + 180) % 360));
-    private final Pose intakeToShootPose = new Pose(37, 117.5,Math.toRadians((149 + 180) % 360));
+    private final Pose startPose         = new Pose(22, 122.5, Math.toRadians((143 + 180) % 360)); //no cange
+    private final Pose shootPose         = new Pose(30, 124, Math.toRadians((165 + 180) % 360));
+    private final Pose preIntakePose     = new Pose(80, 82,   Math.toRadians((0 + 180) % 360));
+    private final Pose intakeMovePose    = new Pose(23, 82,   Math.toRadians((0 + 180) % 360));
+    private final Pose intakeReturnPose  = new Pose(52, 82,   Math.toRadians((0 + 180) % 360));
+    private final Pose intakeToShootPose = new Pose(30, 124,Math.toRadians((165 + 180) % 360));
 
     private PathChain toShootFromStart, toPreIntake, intakeOnMove, intakeOffReturn, toShootReturn;
 
@@ -152,13 +152,10 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 1:
-                // ✅ Turn ON shooter at start of first shooting cycle
                 if (shotStep == 0 && currentShot == 0) {
                     shooter.startShooter();
                 }
                 if (handleShootingPhase()) {
-                    // ✅ Turn OFF shooter after shooting cycle completes
-                    shooter.stopShooter();
                     follower.followPath(toPreIntake);
                     setPathState(2);
                 }
@@ -193,12 +190,7 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 5:
-                // ✅ Turn ON shooter at start of second shooting cycle
-                if (shotStep == 0 && currentShot == 0) {
-                    shooter.startShooter();
-                }
                 if (handleShootingPhase()) {
-                    // ✅ Turn OFF shooter after shooting cycle completes
                     shooter.stopShooter();
                     setPathState(-1);
                 }
@@ -212,6 +204,7 @@ public class BlueAUTO_2025 extends OpMode {
 
         switch (shotStep) {
             case 0:
+                // Step 0: Start shooter, engage hold (keep artifact secure), wait for RPM
                 servos.engageHold();
                 intake.stop();
                 transfer.stop();
@@ -221,6 +214,7 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 1:
+                // Step 1: Wait for shooter to reach target RPM
                 if (currentRPM >= ShooterSubsystem.targetRPM * 0.95) {
                     stepStartTime = now;
                     shotStep = 2;
@@ -228,14 +222,16 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 2:
+                // Step 2: Wait 1 second after reaching RPM
                 if (now - stepStartTime >= 1000) {
-                    servos.engageHold();
+                    servos.engageHold(); // Open hold servo
                     stepStartTime = now;
                     shotStep = 3;
                 }
                 break;
 
             case 3:
+                // Step 3: Wait 0.5 seconds, then turn on intake
                 if (now - stepStartTime >= 500) {
                     intake.start();
                     transfer.start();
@@ -245,13 +241,16 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 4:
+                // Step 4: Wait for RPM dip (shot fired) or 5-second timeout
                 if (currentRPM < ShooterSubsystem.targetRPM * 0.90) {
-                    servos.retractHold();
+                    // RPM dipped - shot fired!
+                    servos.retractHold(); // Close hold servo immediately
                     intake.stop();
                     transfer.stop();
                     stepStartTime = now;
-                    shotStep = 6;
-                } else if (now - stepStartTime > 5000) {
+                    shotStep = 6; // Go to cooldown
+                } else if (now - stepStartTime > 3000) {
+                    // Timeout - use push servo as fallback
                     servos.engagePush();
                     stepStartTime = now;
                     shotStep = 5;
@@ -259,6 +258,7 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 5:
+                // Step 5: Push servo fallback (hold for 1 second)
                 if (now - stepStartTime >= 1000) {
                     intake.stop();
                     transfer.stop();
@@ -270,12 +270,13 @@ public class BlueAUTO_2025 extends OpMode {
                 break;
 
             case 6:
+                // Step 6: Cooldown period (0.5s) before next shot
                 if (now - stepStartTime >= 500) {
                     currentShot++;
                     if (currentShot < totalShots) {
-                        shotStep = 0;
+                        shotStep = 0; // Next shot
                     } else {
-                        return true; // ✅ Shooting cycle complete
+                        return true; // All shots complete
                     }
                 }
                 break;
